@@ -89,7 +89,7 @@ function sp(){
         // Add the scatter dots.
         svg.selectAll(".dot")
             .data(self.data)
-            .enter().append("circle") // add new element
+            .enter().append("circle") // add new element, enter automatically creates new DOM element
             .attr("class", "dot")
             .attr("cx", function(d) {
                 return x(d["Personal earnings"]); //Load data
