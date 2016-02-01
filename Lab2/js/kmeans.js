@@ -58,19 +58,40 @@
     			distanceArray.push(Math.sqrt(distance));
     		}
     		// save the index of the best cluster.
-    		// the index will correspond to the index in the random array.
+    		// the value will correspond to the index in the random array.
     		bestClusterIndexArray.push(distanceArray.indexOf(Math.min.apply(Math, distanceArray)));
     		distance = 0;
     		distanceArray = [];
     	}
-    	console.log(bestClusterIndexArray);   
-
+    //	console.log(bestClusterIndexArray);  
+        
+        var clusterArr = [];
     	// Step 3
-    	for (var i = 0; i < data.length; i++)
-    	{
-    		
-    	}     
+        var avgA = [0,0];
+        var avgB = [0,0];
+        var avgC = [0,0];
+        var counter = [0,0];
+        var newCentroids = [];
+        for (var i = 0; i < bestClusterIndexArray.length; i++)
+        {
+            avgA[bestClusterIndexArray[i]] += parseFloat(data[i]["A"]);
+            avgB[bestClusterIndexArray[i]] += parseFloat(data[i]["B"]);
+            avgC[bestClusterIndexArray[i]] += parseFloat(data[i]["C"]);
+            counter[bestClusterIndexArray[i]] = counter[bestClusterIndexArray[i]] + 1;
+            //console.log(counter);
+            if (i == bestClusterIndexArray.length - 1)
+            {
+                for (var j = 0; j < k; j++)
+                {
+                    avgA[j] = avgA[j]/counter[j];
+                    avgB[j] = avgB[j]/counter[j];
+                    avgC[j] = avgC[j]/counter[j];
+                    newCentroids.push( [avgA[j], avgB[j], avgC[j]]);
+                }
 
+            }
+        }
+        console.log(newCentroids);
 
 
     };
