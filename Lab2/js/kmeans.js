@@ -7,6 +7,9 @@
    
     function kmeans(data, k) 
     {
+        var quality = 0;
+        var newQuality = 0;
+
     	// set initial max/min values
     	var aMaxData = data[0]["A"];
     	var bMaxData = data[0]["B"];
@@ -41,57 +44,123 @@
     	var distance;
     	var distanceArray;
     	var minArray = [];
-
+        var counter = 0;
     	var minVal;
     	var bestClusterIndexArray = [];
     	//console.log(listOfRandoms[1][1]);
-    	// Step 2
-    	for (var i = 0; i < data.length; i++)
-    	{
-    		distance = 0;
-    		distanceArray = [];
-    		for (var j = 0; j < k; j++)
-    		{
-    			distance = (Math.pow(data[i]["A"] - listOfRandoms[j][0], 2)) +
-    						(Math.pow(data[i]["B"] - listOfRandoms[j][1], 2)) + 
-    						(Math.pow(data[i]["C"] - listOfRandoms[j][2], 2));
-    			distanceArray.push(Math.sqrt(distance));
-    		}
-    		// save the index of the best cluster.
-    		// the value will correspond to the index in the random array.
-    		bestClusterIndexArray.push(distanceArray.indexOf(Math.min.apply(Math, distanceArray)));
-    		distance = 0;
-    		distanceArray = [];
-    	}
-    //	console.log(bestClusterIndexArray);  
-        
-        var clusterArr = [];
-    	// Step 3
-        var avgA = [0,0];
-        var avgB = [0,0];
-        var avgC = [0,0];
-        var counter = [0,0];
-        var newCentroids = [];
-        for (var i = 0; i < bestClusterIndexArray.length; i++)
+        var iterations = 0;
+        do
         {
-            avgA[bestClusterIndexArray[i]] += parseFloat(data[i]["A"]);
-            avgB[bestClusterIndexArray[i]] += parseFloat(data[i]["B"]);
-            avgC[bestClusterIndexArray[i]] += parseFloat(data[i]["C"]);
-            counter[bestClusterIndexArray[i]] = counter[bestClusterIndexArray[i]] + 1;
-            //console.log(counter);
-            if (i == bestClusterIndexArray.length - 1)
-            {
-                for (var j = 0; j < k; j++)
-                {
-                    avgA[j] = avgA[j]/counter[j];
-                    avgB[j] = avgB[j]/counter[j];
-                    avgC[j] = avgC[j]/counter[j];
-                    newCentroids.push( [avgA[j], avgB[j], avgC[j]]);
-                }
+            var distance;
+            var distanceArray;
+            var minArray = [];
 
+            var minVal;
+            var bestClusterIndexArray = [];
+        	// Step 2
+        	for (var i = 0; i < data.length; i++)
+        	{
+        		distance = 0;
+        		distanceArray = [];
+        		for (var j = 0; j < k; j++)
+        		{
+        			distance = (Math.pow(data[i]["A"] - listOfRandoms[j][0], 2)) +
+        						(Math.pow(data[i]["B"] - listOfRandoms[j][1], 2)) + 
+        						(Math.pow(data[i]["C"] - listOfRandoms[j][2], 2));
+        			distanceArray.push(Math.sqrt(distance));
+        		}
+        		// save the index of the best cluster.
+        		// the value will correspond to the index in the random array.
+        		bestClusterIndexArray.push(distanceArray.indexOf(Math.min.apply(Math, distanceArray)));
+        		distance = 0;
+        		distanceArray = [];
+        	}
+        //	console.log(bestClusterIndexArray);  
+            
+        	// Step 3
+
+            /* recalculate centroids by computing the average of all data points 
+               assigned to each centroid */
+            var avgA = [0,0];
+            var avgB = [0,0];
+            var avgC = [0,0];
+            var counter = [0,0];
+            var newCentroids = [];
+            for (var i = 0; i < bestClusterIndexArray.length; i++)
+            {
+                //console.log(data[i]["A"]);
+                avgA[bestClusterIndexArray[i]] += parseFloat(data[i]["A"]);
+                avgB[bestClusterIndexArray[i]] += parseFloat(data[i]["B"]);
+                avgC[bestClusterIndexArray[i]] += parseFloat(data[i]["C"]);
+                counter[bestClusterIndexArray[i]] = counter[bestClusterIndexArray[i]] + 1;
+                //console.log(counter);
+                if (i == bestClusterIndexArray.length - 1)
+                {
+                    for (var j = 0; j < k; j++)
+                    {
+                        avgA[j] = avgA[j]/counter[j];
+                        avgB[j] = avgB[j]/counter[j];
+                        avgC[j] = avgC[j]/counter[j];
+                        newCentroids.push( [avgA[j], avgB[j], avgC[j]]);
+                    }
+
+                }
             }
-        }
-        console.log(newCentroids);
+            //console.log(newCentroids);
+            //console.log(bestClusterIndexArray);
+
+            // Step 4
+            var qualityArray = [];
+            var iterate = false;
+            for (var i = 0; i < bestClusterIndexArray.length; i++)
+            {
+                if (iterations == 0)
+                {
+                    quality += Math.pow(parseFloat(data[i]["A"]) - 
+                    newCentroids[bestClusterIndexArray[i]][0], 2) + 
+                    Math.pow(parseFloat(data[i]["B"]) - 
+                    newCentroids[bestClusterIndexArray[i]][1], 2) + 
+                    Math.pow(parseFloat(data[i]["C"]) -
+                    newCentroids[bestClusterIndexArray[i]][2], 2);
+                    iterate = true;
+                    
+                }
+                else
+                {
+                    newQuality += Math.pow(parseFloat(data[i]["A"]) - 
+                    newCentroids[bestClusterIndexArray[i]][0], 2) + 
+                    Math.pow(parseFloat(data[i]["B"]) - 
+                    newCentroids[bestClusterIndexArray[i]][1], 2) + 
+                    Math.abs(parseFloat(data[i]["C"]) -
+                    newCentroids[bestClusterIndexArray[i]][2], 2);
+                    console.log(newQuality);
+                    if (newQuality < quality) // go again
+                    {
+                        quality = newQuality;
+                        iterate = true;
+                    }
+                    else
+                    {
+                        iterate = false;
+                    }
+                }
+            }
+            /*console.log(newQuality);
+            console.log(quality);*/
+            //console.log(iterate);
+            
+            /*counter++;
+            console.log(counter);*/
+        }while(iterate);
+
+        console.log(newQuality)
+        console.log(quality);
+        
+        console.log("HEJ");
+
+
+
+
 
 
     };
