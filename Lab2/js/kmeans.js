@@ -9,8 +9,7 @@
     function assignToCluster(theCentroids, theData)
     {
         var dataWithCentroidIndex = [];
-        //console.log(theCentroids);
-        console.log(dataWithCentroidIndex);
+        
         for (var i = 0; i < theData.length; i++)
         {
             dataWithCentroidIndex.push({A:0, B:0, C:0, centroidIndex:0});
@@ -18,7 +17,7 @@
             dataWithCentroidIndex[i].B = parseFloat(theData[i]["B"]);
             dataWithCentroidIndex[i].C = parseFloat(theData[i]["C"]);
         }
-       // console.log(dataWithCentroidIndex);
+        console.log(dataWithCentroidIndex);
 
         for (var i = 0; i < dataWithCentroidIndex.length; i++)
         {
@@ -149,11 +148,13 @@
             {
                 iterations++;
                 iterate = true;
+                theDataWithIndex = [];
                 theDataWithIndex = assignToCluster(theCentroids, theData);
                 theCentroids = recalculateCentroids(theDataWithIndex, theCentroids);
             }
             else
             {
+
                 if (newQuality < quality)
                 {
                     quality = newQuality;
@@ -171,48 +172,12 @@
             }
         }while(iterate);
         
-
-
-         /*   for (var i = 0; i < bestCentroidIndexArray.length; i++)
-            {
-                if (iterations == 0)
-                {
-            
-                    quality += Math.pow(parseFloat(data[i]["A"]) - 
-                    newCentroids[bestCentroidIndexArray[i]][0], 2) + 
-                    Math.pow(parseFloat(data[i]["B"]) - 
-                    newCentroids[bestCentroidIndexArray[i]][1], 2) + 
-                    Math.pow(parseFloat(data[i]["C"]) -
-                    newCentroids[bestCentroidIndexArray[i]][2], 2);
-                    iterate = true;
-                    if (i == bestCentroidIndexArray.length -1)
-                    {
-                        iterations++;
-                    } 
-                }
-                else
-                {
-                   
-                    newQuality += Math.pow(parseFloat(data[i]["A"]) - 
-                    newCentroids[bestCentroidIndexArray[i]][0], 2) + 
-                    Math.pow(parseFloat(data[i]["B"]) - 
-                    newCentroids[bestCentroidIndexArray[i]][1], 2) + 
-                    Math.pow(parseFloat(data[i]["C"]) -
-                    newCentroids[bestCentroidIndexArray[i]][2], 2);
-                    if (i == bestCentroidIndexArray.length -1)
-                    {
-                        iterations++;
-                    }
-                }
-            }*/
+        return newQuality;
 
     };
     function kmeans(data, k) 
     {
-        k=100;
-        var quality = 0;
-        var newQuality = 0;
-        var iterate = false;     
+        k=100;   
 
         /* ska fortfarande ha kvar de gamla klustervärden.
          När punkter inte "byter" centroid till en bättre, då e det klart*/
@@ -225,12 +190,7 @@
             randomCentroids.push(random);
         }
         var dataWithIndex = assignToCluster(randomCentroids, data);
-        //assign to cluster
-        var distance;
-        var distanceArray;
-        var minArray = [];
-        //var counter = 0;
-        var minVal;
+      
         var newCentroids = [];
         var iterations = 0;
 
