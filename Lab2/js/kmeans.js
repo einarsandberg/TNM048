@@ -98,7 +98,6 @@
                 avgC = 0;
             }
         }
-
         return newCentroids;
     };
     function checkQuality(theDataWithIndex, theData, theCentroids)
@@ -135,6 +134,7 @@
                                 quality += Math.pow(editDataWithIndex[j].A - theCentroids[currIndex].A, 2) +
                                 Math.pow(editDataWithIndex[j].B - theCentroids[currIndex].B, 2) + 
                                 Math.pow(editDataWithIndex[j].C - theCentroids[currIndex].C, 2);
+                                
                             }
                             else
                             {
@@ -147,6 +147,9 @@
                     }
                 }
             }
+            console.log(quality);
+            console.log(newQuality);
+
             if (iterations == 0)
             {
                 iterations++;
@@ -158,8 +161,7 @@
             }
             else
             {
-                console.log(newQuality);
-                console.log(quality);
+
 
                 if (newQuality < quality)
                 {
@@ -179,12 +181,12 @@
             }
         }while(iterate);
         
-        return newQuality;
+        return theDataWithIndex;
 
     };
     function kmeans(data, k) 
     {
-        k=100;   
+           
 
         /* ska fortfarande ha kvar de gamla klustervärden.
          När punkter inte "byter" centroid till en bättre, då e det klart*/
@@ -203,77 +205,5 @@
 
         var newCentroids = recalculateCentroids(dataWithIndex, randomCentroids);
 
-        checkQuality(dataWithIndex, data, newCentroids);
-        /*do
-        {*/
-            
-
-           
-            // Step 4
-           /* var qualityArray = [];
-        
-       
-            for (var i = 0; i < bestCentroidIndexArray.length; i++)
-            {
-                if (iterations == 0)
-                {
-            
-                    quality += Math.pow(parseFloat(data[i]["A"]) - 
-                    newCentroids[bestCentroidIndexArray[i]][0], 2) + 
-                    Math.pow(parseFloat(data[i]["B"]) - 
-                    newCentroids[bestCentroidIndexArray[i]][1], 2) + 
-                    Math.pow(parseFloat(data[i]["C"]) -
-                    newCentroids[bestCentroidIndexArray[i]][2], 2);
-                    iterate = true;
-                    if (i == bestCentroidIndexArray.length -1)
-                    {
-                        iterations++;
-                    }
-                    
-                    
-                }
-                else
-                {
-                   
-                    newQuality += Math.pow(parseFloat(data[i]["A"]) - 
-                    newCentroids[bestCentroidIndexArray[i]][0], 2) + 
-                    Math.pow(parseFloat(data[i]["B"]) - 
-                    newCentroids[bestCentroidIndexArray[i]][1], 2) + 
-                    Math.pow(parseFloat(data[i]["C"]) -
-                    newCentroids[bestCentroidIndexArray[i]][2], 2);
-                    if (i == bestCentroidIndexArray.length -1)
-                    {
-                        iterations++;
-                    }
-                }
-            }
-   
-            if (iterations <= 1)
-            {
-                iterate = true;
-            }
-            else if (iterations > 1 && newQuality < quality)
-            {
-                iterate = true;
-                quality = newQuality;
-            }
-            else if (iterations > 1 && newQuality >= quality)
-            {
-                iterate = false;
-            }
-
-           */
-        //}while(iterate);
-
-
-
-   
-        
-       
-
-
-
-
-
-
+        return checkQuality(dataWithIndex, data, newCentroids);
     };
