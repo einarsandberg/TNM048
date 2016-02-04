@@ -16,8 +16,8 @@
             dataWithCentroidIndex[i].A = parseFloat(theData[i]["A"]);
             dataWithCentroidIndex[i].B = parseFloat(theData[i]["B"]);
             dataWithCentroidIndex[i].C = parseFloat(theData[i]["C"]);
+
         }
-        console.log(dataWithCentroidIndex);
 
         for (var i = 0; i < dataWithCentroidIndex.length; i++)
         {
@@ -59,7 +59,7 @@
             editDataWithIndex[i].centroidIndex = theDataWithIndex[i].centroidIndex;
         }
 
-        var counter;
+        var counter = 0;
         var newCentroids = [];
         for (var i = 0; i < theCentroids.length; i++)
         {
@@ -87,16 +87,17 @@
                 avgA/=counter;
                 avgB/=counter;
                 avgC/=counter;
+
                 newCentroids[correctIndex].A = avgA;
                 newCentroids[correctIndex].B = avgB;
                 newCentroids[correctIndex].C = avgC;
+
                 counter = 0;
                 avgA = 0;
                 avgB = 0;
                 avgC = 0;
             }
         }
-
         return newCentroids;
     };
     function checkQuality(theDataWithIndex, theData, theCentroids)
@@ -104,6 +105,10 @@
         var quality = 0;
         var iterations = 0;
         var newQuality = 0;
+        for (var i = 0; i < theCentroids.length; i++)
+        {
+            console.log(theCentroids[i].A);
+        }
         do
         {
             var editDataWithIndex = [];
@@ -116,7 +121,7 @@
                 editDataWithIndex[i].centroidIndex = theDataWithIndex[i].centroidIndex;
             }
             var currIndex = -1;
-        
+            
             for (var i = 0; i < editDataWithIndex.length; i++)
             {
                 currIndex = editDataWithIndex[i].centroidIndex;
@@ -128,7 +133,7 @@
                         {
                             if (iterations == 0)
                             {
-
+                                // some newCentroids are NaN
                                 quality += Math.pow(editDataWithIndex[j].A - theCentroids[currIndex].A, 2) +
                                 Math.pow(editDataWithIndex[j].B - theCentroids[currIndex].B, 2) + 
                                 Math.pow(editDataWithIndex[j].C - theCentroids[currIndex].C, 2);
@@ -149,6 +154,7 @@
                 iterations++;
                 iterate = true;
                 theDataWithIndex = [];
+          
                 theDataWithIndex = assignToCluster(theCentroids, theData);
                 theCentroids = recalculateCentroids(theDataWithIndex, theCentroids);
             }
