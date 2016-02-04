@@ -98,6 +98,7 @@
                 avgC = 0;
             }
         }
+
         return newCentroids;
     };
     function checkQuality(theDataWithIndex, theData, theCentroids)
@@ -105,10 +106,7 @@
         var quality = 0;
         var iterations = 0;
         var newQuality = 0;
-        for (var i = 0; i < theCentroids.length; i++)
-        {
-            console.log(theCentroids[i].A);
-        }
+
         do
         {
             var editDataWithIndex = [];
@@ -160,10 +158,13 @@
             }
             else
             {
+                console.log(newQuality);
+                console.log(quality);
 
                 if (newQuality < quality)
                 {
                     quality = newQuality;
+                    newQuality = 0;
                     iterations++;
                     iterate = true;
                     theDataWithIndex = assignToCluster(theCentroids, theData);
