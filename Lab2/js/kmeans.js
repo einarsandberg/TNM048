@@ -6,43 +6,44 @@
     */
    
     
-    function assignToCluster(theCentroids, theData)
+    function assignToCluster(theCentroids, theData, theDim)
     {
         var dataWithCentroidIndex = [];
-        
         for (var i = 0; i < theData.length; i++)
         {
-            dataWithCentroidIndex.push({A:0, B:0, C:0, centroidIndex:0});
-            dataWithCentroidIndex[i].A = parseFloat(theData[i]["A"]);
-            dataWithCentroidIndex[i].B = parseFloat(theData[i]["B"]);
-            dataWithCentroidIndex[i].C = parseFloat(theData[i]["C"]);
+            dataWithCentroidIndex.push([]);
+            for (var j = 0; j < theDim.length; j++)
+            {
+                dataWithCentroidIndex[i].push(parseFloat(theData[i][theDim[j]]));
+            }
 
+            dataWithCentroidIndex[i].push(0) // centroid index
         }
-
+        
         for (var i = 0; i < dataWithCentroidIndex.length; i++)
         {
             distance = 0;
             distanceArray = [];
             for (var j = 0; j < theCentroids.length; j++)
             {
-                distance = (Math.pow(parseFloat(dataWithCentroidIndex[i].A) - theCentroids[j].A, 2)) +
-                            (Math.pow(parseFloat(dataWithCentroidIndex[i].B) - theCentroids[j].B, 2)) + 
-                            (Math.pow(parseFloat(dataWithCentroidIndex[i].C) - theCentroids[j].C, 2));
+                for ( var k = 0; k < theDim.length; k++)
+                {
+                    distance += (Math.pow(parseFloat(dataWithCentroidIndex[i][k]) - 
+                        theCentroids[j][k], 2));
+                }
+                
                 distanceArray.push(Math.sqrt(distance));
+                distance = 0;
                 
             }
-            dataWithCentroidIndex[i].centroidIndex = distanceArray.indexOf(Math.min.apply(Math, distanceArray));
-           
-            // save the index of the best centroid.
-            // the value will correspond to the index in the random array.
-            //bestCentroidIndexArray.push(distanceArray.indexOf(Math.min.apply(Math, distanceArray)));
+        
+            dataWithCentroidIndex[i][theDim.length] = distanceArray.indexOf(Math.min.apply(Math, distanceArray));
             distance = 0;
             distanceArray = []; 
         }
-
         return dataWithCentroidIndex;
     };
-    function recalculateCentroids(theDataWithIndex, theCentroids)
+    function recalculateCentroids(theDataWithIndex, theCentroids, theDim)
     {
 
         var avgA = 0;
@@ -50,57 +51,65 @@
         var avgC = 0;
         var currIndex;
         var editDataWithIndex = [];
+        var averages = [];
+
+        for (var i = 0; i < theDim.length; i++)
+        {
+            averages.push(0);
+        }
+
         for (var i = 0; i < theDataWithIndex.length; i++)
         {
-            editDataWithIndex.push({A:0, B:0, C:0, centroidIndex:0});
-            editDataWithIndex[i].A = theDataWithIndex[i].A;
-            editDataWithIndex[i].B = theDataWithIndex[i].B;
-            editDataWithIndex[i].C = theDataWithIndex[i].C;
-            editDataWithIndex[i].centroidIndex = theDataWithIndex[i].centroidIndex;
+            editDataWithIndex.push([]);
+            for (var j = 0; j < theDim.length; j++)
+            {
+                editDataWithIndex[i].push(parseFloat(theDataWithIndex[i][j]));
+            }
+            editDataWithIndex[i].push(theDataWithIndex[i][theDim.length]); // centroid index
         }
 
         var counter = 0;
         var newCentroids = [];
         for (var i = 0; i < theCentroids.length; i++)
         {
-            newCentroids.push({A:0, B:0, C:0});
+            newCentroids.push([]);
+           for (var j = 0; j < theDim.length; j++)
+           {
+            newCentroids[i].push(0);
+           }
         }
         var correctIndex = -1;
         for (var i = 0; i < editDataWithIndex.length; i++)
         {
-            currIndex = editDataWithIndex[i].centroidIndex;
+            currIndex = editDataWithIndex[i][theDim.length];
             if (currIndex != -1)
             {
                 for (var j = 0; j < editDataWithIndex.length; j++)
                 {
-                    if (editDataWithIndex[j].centroidIndex == currIndex)
+                    if (editDataWithIndex[j][theDim.length]== currIndex)
                     {
-                        avgA+=parseFloat(editDataWithIndex[j].A);
-                        avgB+=parseFloat(editDataWithIndex[j].B);
-                        avgC+=parseFloat(editDataWithIndex[j].C);
+                        for (var k = 0; k < theDim.length; k++)
+                        {
+                            averages[k]+=editDataWithIndex[j][k];
+                        }
                         counter++;
                         correctIndex = currIndex;
                         //set to -1 so theyre not calculated twice or more
                         editDataWithIndex[j].centroidIndex = -1;
                     }
                 }
-                avgA/=counter;
-                avgB/=counter;
-                avgC/=counter;
-
-                newCentroids[correctIndex].A = avgA;
-                newCentroids[correctIndex].B = avgB;
-                newCentroids[correctIndex].C = avgC;
-
+                for (var j = 0; j < averages.length; j++)
+                {
+                    averages[j]/=counter;
+                    newCentroids[correctIndex][j] = averages[j];
+                    averages[j] = 0;
+                }
                 counter = 0;
-                avgA = 0;
-                avgB = 0;
-                avgC = 0;
             }
         }
         return newCentroids;
     };
-    function checkQuality(theDataWithIndex, theData, theCentroids)
+    function checkQuality(theDataWithIndex, theData, theCentroids, theDim)
     {
         var quality = 0;
         var iterations = 0;
@@ -112,43 +121,44 @@
             var editDataWithIndex = [];
             for (var i = 0; i < theDataWithIndex.length; i++)
             {
-                editDataWithIndex.push({A:0, B:0, C:0, centroidIndex:0});
-                editDataWithIndex[i].A = theDataWithIndex[i].A;
-                editDataWithIndex[i].B = theDataWithIndex[i].B;
-                editDataWithIndex[i].C = theDataWithIndex[i].C;
-                editDataWithIndex[i].centroidIndex = theDataWithIndex[i].centroidIndex;
+                editDataWithIndex.push([]);
+                for (var j = 0; j < theDim.length; j++)
+                {
+                    editDataWithIndex[i].push(parseFloat(theDataWithIndex[i][j]));
+                }
+                editDataWithIndex[i].push(theDataWithIndex[i][theDim.length]); // centroid index
             }
             var currIndex = -1;
             
             for (var i = 0; i < editDataWithIndex.length; i++)
             {
-                currIndex = editDataWithIndex[i].centroidIndex;
+                currIndex = editDataWithIndex[i][theDim.length];
                 if (currIndex != -1)
                 {
                     for (var j = 0; j < editDataWithIndex.length; j++)
                     {  
-                        if (editDataWithIndex[j].centroidIndex == currIndex)
+                        if (editDataWithIndex[j][theDim.length] == currIndex)
                         {
                             if (iterations == 0)
                             {
-                                quality += Math.pow(editDataWithIndex[j].A - theCentroids[currIndex].A, 2) +
-                                Math.pow(editDataWithIndex[j].B - theCentroids[currIndex].B, 2) + 
-                                Math.pow(editDataWithIndex[j].C - theCentroids[currIndex].C, 2);
+                                for (var k = 0; k < theDim.length; k++)
+                                {
+                                    quality+= Math.pow(editDataWithIndex[j][k] - theCentroids[currIndex][k], 2);
+                                }
                                 
                             }
                             else
                             {
-
-                                newQuality += Math.pow(editDataWithIndex[j].A - theCentroids[currIndex].A, 2) +
-                                Math.pow(editDataWithIndex[j].B - theCentroids[currIndex].B, 2) + 
-                                Math.pow(editDataWithIndex[j].C - theCentroids[currIndex].C, 2);
+                                for (var k = 0; k < theDim.length; k++)
+                                {
+                                    newQuality+= Math.pow(editDataWithIndex[j][k] - theCentroids[currIndex][k], 2);
+                                }
                             }
                         }
                     }
                 }
             }
-            console.log(quality);
-            console.log(newQuality);
+         
 
             if (iterations == 0)
             {
@@ -156,8 +166,8 @@
                 iterate = true;
                 theDataWithIndex = [];
           
-                theDataWithIndex = assignToCluster(theCentroids, theData);
-                theCentroids = recalculateCentroids(theDataWithIndex, theCentroids);
+                theDataWithIndex = assignToCluster(theCentroids, theData, theDim);
+                theCentroids = recalculateCentroids(theDataWithIndex, theCentroids, theDim);
             }
             else
             {
@@ -170,18 +180,19 @@
                     newQuality = 0;
                     iterations++;
                     iterate = true;
-                    theDataWithIndex = assignToCluster(theCentroids, theData);
-                    theCentroids = recalculateCentroids(theDataWithIndex, theCentroids);
+                    theDataWithIndex = assignToCluster(theCentroids, theData, theDim);
+                    theCentroids = recalculateCentroids(theDataWithIndex, theCentroids, theDim);
                     oldDataWithIndex = [];
                     // save the old data in case the quality gets worse next iteration
-                    /*for (var a = 0; a < theDataWithIndex.length; a++)
+                    for (var i = 0; i < theDataWithIndex.length; i++)
                     {
-                        oldDataWithIndex.push({A:0, B:0, C:0, centroidIndex:0});
-                        oldDataWithIndex[a].A = theDataWithIndex[a].A;
-                        oldDataWithIndex[a].B = theDataWithIndex[a].B;
-                        oldDataWithIndex[a].C = theDataWithIndex[a].C;
-                        oldDataWithIndex[a].centroidIndex = theDataWithIndex[a].centroidIndex;
-                    }*/
+                        oldDataWithIndex.push([]);
+                        for (var j = 0; j < theDim.length; j++)
+                        {
+                            oldDataWithIndex[i].push(parseFloat(theDataWithIndex[i][j]));
+                        }
+                            oldDataWithIndex[i].push(theDataWithIndex[i][theDim.length]); // centroid index
+                    }
 
                 }
                 else
@@ -192,37 +203,49 @@
             }
         }while(iterate);
 
-      /*  if (newQuality <=oldQuality)
+        if (newQuality <=oldQuality)
         {
             return theDataWithIndex;
         }
         else
         {
             return oldDataWithIndex;
-        }*/
+        }
         return theDataWithIndex;
 
     };
+
+    function createRandomCentroid(data, dim)
+    {
+        var random = data[Math.floor(Math.random() * data.length)];
+        var randomCentroid = [];
+        for (var i = 0; i < dim.length; i++)
+        {
+            randomCentroid.push(Number(random[dim[i]]));
+        }   
+        return randomCentroid;
+    }
+
     function kmeans(data, k) 
     {
-           
-
-        /* ska fortfarande ha kvar de gamla klustervärden.
-         När punkter inte "byter" centroid till en bättre, då e det klart*/
         
+        var dim = Object.keys(data[0]);
         var randomCentroids = [];
+        var keys = d3.keys(data[0]);
+       
         // Step 1
         for (var i = 0; i < k; i++)
         {
-            var random = data[Math.floor(Math.random() * data.length)];
-            randomCentroids.push(random);
+            randomCentroids.push(createRandomCentroid(data, dim));
         }
-        var dataWithIndex = assignToCluster(randomCentroids, data);
+        var dataWithIndex = assignToCluster(randomCentroids, data, dim);
       
         var newCentroids = [];
         var iterations = 0;
 
-        var newCentroids = recalculateCentroids(dataWithIndex, randomCentroids);
+        var newCentroids = recalculateCentroids(dataWithIndex, randomCentroids, dim);
 
-        return checkQuality(dataWithIndex, data, newCentroids);
+        return checkQuality(dataWithIndex, data, newCentroids, dim);
     };
+
+

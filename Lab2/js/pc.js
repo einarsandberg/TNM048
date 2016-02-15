@@ -40,11 +40,12 @@ function pc(){
         self.data = data;
        // console.log(data);
         
-        var k = 2;
+        var k = 4;
         var kmeansRes = kmeans(data,k);
+        var dim = Object.keys(data[0]);
         for (var i = 0; i < data.length; i++)
         {
-            data[i].centroidIndex = kmeansRes[i].centroidIndex;
+            data[i].centroidIndex = kmeansRes[i][dim.length]; // centroid index
         }
         //initialize the cluster colors
         self.color = d3.scale.category20()
@@ -72,7 +73,7 @@ function pc(){
             .enter().append("svg:path")
             .attr("d", path)
             //.style("stroke", function(d) { return "hsl(" + Math.random() * 360 + ",100%,50%)"; }); 
-            .style("stroke", function(d) { return self.color(d.centroidIndex); });
+            .style("stroke", function(d) {  return self.color(d.centroidIndex); });
 
     
 
