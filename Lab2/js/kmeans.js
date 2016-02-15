@@ -31,10 +31,8 @@
                     distance += (Math.pow(parseFloat(dataWithCentroidIndex[i][k]) - 
                         theCentroids[j][k], 2));
                 }
-                
                 distanceArray.push(Math.sqrt(distance));
                 distance = 0;
-                
             }
         
             dataWithCentroidIndex[i][theDim.length] = distanceArray.indexOf(Math.min.apply(Math, distanceArray));
@@ -45,7 +43,6 @@
     };
     function recalculateCentroids(theDataWithIndex, theCentroids, theDim)
     {
-
         var avgA = 0;
         var avgB = 0;
         var avgC = 0;
@@ -114,7 +111,6 @@
         var quality = 0;
         var iterations = 0;
         var newQuality = 0;
-        var oldQuality = 0;
         var oldDataWithIndex = [];
         do
         {
@@ -158,8 +154,6 @@
                     }
                 }
             }
-         
-
             if (iterations == 0)
             {
                 iterations++;
@@ -168,15 +162,15 @@
           
                 theDataWithIndex = assignToCluster(theCentroids, theData, theDim);
                 theCentroids = recalculateCentroids(theDataWithIndex, theCentroids, theDim);
+            
+
             }
             else
             {
-
-
                 if (newQuality < quality)
                 {
                     quality = newQuality;
-                    oldQuality = newQuality;
+                    
                     newQuality = 0;
                     iterations++;
                     iterate = true;
@@ -202,17 +196,20 @@
                 }
             }
         }while(iterate);
-
-        if (newQuality <=oldQuality)
+        // if the quality got worse on last iteration
+        if (oldDataWithIndex.length == theDataWithIndex.length)
         {
-            return theDataWithIndex;
-        }
-        else
-        {
+            console.log("hej");
             return oldDataWithIndex;
         }
-        return theDataWithIndex;
+        
+        else
+        {
+            console.log("tju");
+            return theDataWithIndex;
+        }
 
+   
     };
 
     function createRandomCentroid(data, dim)
@@ -228,11 +225,9 @@
 
     function kmeans(data, k) 
     {
-        
         var dim = Object.keys(data[0]);
         var randomCentroids = [];
         var keys = d3.keys(data[0]);
-       
         // Step 1
         for (var i = 0; i < k; i++)
         {
