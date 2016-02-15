@@ -105,7 +105,8 @@
         var quality = 0;
         var iterations = 0;
         var newQuality = 0;
-
+        var oldQuality = 0;
+        var oldDataWithIndex = [];
         do
         {
             var editDataWithIndex = [];
@@ -130,7 +131,6 @@
                         {
                             if (iterations == 0)
                             {
-                                // some newCentroids are NaN
                                 quality += Math.pow(editDataWithIndex[j].A - theCentroids[currIndex].A, 2) +
                                 Math.pow(editDataWithIndex[j].B - theCentroids[currIndex].B, 2) + 
                                 Math.pow(editDataWithIndex[j].C - theCentroids[currIndex].C, 2);
@@ -166,11 +166,22 @@
                 if (newQuality < quality)
                 {
                     quality = newQuality;
+                    oldQuality = newQuality;
                     newQuality = 0;
                     iterations++;
                     iterate = true;
                     theDataWithIndex = assignToCluster(theCentroids, theData);
                     theCentroids = recalculateCentroids(theDataWithIndex, theCentroids);
+                    oldDataWithIndex = [];
+                    // save the old data in case the quality gets worse next iteration
+                    /*for (var a = 0; a < theDataWithIndex.length; a++)
+                    {
+                        oldDataWithIndex.push({A:0, B:0, C:0, centroidIndex:0});
+                        oldDataWithIndex[a].A = theDataWithIndex[a].A;
+                        oldDataWithIndex[a].B = theDataWithIndex[a].B;
+                        oldDataWithIndex[a].C = theDataWithIndex[a].C;
+                        oldDataWithIndex[a].centroidIndex = theDataWithIndex[a].centroidIndex;
+                    }*/
 
                 }
                 else
@@ -180,7 +191,15 @@
                 }
             }
         }while(iterate);
-        
+
+      /*  if (newQuality <=oldQuality)
+        {
+            return theDataWithIndex;
+        }
+        else
+        {
+            return oldDataWithIndex;
+        }*/
         return theDataWithIndex;
 
     };
